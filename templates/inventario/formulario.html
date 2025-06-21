@@ -1,0 +1,272 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo }} - {{ block.super }}{% endblock %}
+
+{% block header %}
+<div class="flex items-center justify-between">
+    <div class="flex items-center">
+        <a href="{% url 'listar_inventario' %}" 
+           class="mr-4 p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors duration-200">
+            <i class="fas fa-arrow-left text-lg"></i>
+        </a>
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">
+                <i class="fas fa-{% if 'Crear' in titulo %}plus{% else %}edit{% endif %} text-blue-600 mr-3"></i>
+                {{ titulo }}
+            </h1>
+            <p class="mt-2 text-gray-600">
+                {% if 'Crear' in titulo %}
+                    Agrega un nuevo producto al inventario
+                {% else %}
+                    Modifica la información del inventario
+                {% endif %}
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl">
+    <div class="bg-white shadow-sm rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">
+                <i class="fas fa-form text-gray-600 mr-2"></i>
+                Información del Inventario
+            </h2>
+        </div>
+        
+        <form method="post" class="p-6">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <div class="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
+                    <div class="flex">
+                        <i class="fas fa-exclamation-circle text-red-400 mr-2 mt-0.5"></i>
+                        <div class="text-red-800">
+                            <h4 class="font-medium">Error en el formulario</h4>
+                            <ul class="mt-2 list-disc list-inside text-sm">
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Empleado -->
+                <div>
+                    <label for="{{ form.empleado.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-user text-gray-500 mr-1"></i>
+                        Empleado *
+                    </label>
+                    <select name="{{ form.empleado.name }}" id="{{ form.empleado.id_for_label }}" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 {% if form.empleado.errors %}border-red-300 focus:ring-red-500 focus:border-red-500{% endif %}"
+                            required>
+                        <option value="">Seleccione un empleado</option>
+                        {% for value, label in form.empleado.field.choices %}
+                            {% if value %}
+                                <option value="{{ value }}" {% if form.empleado.value == value %}selected{% endif %}>{{ label }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    {% if form.empleado.errors %}
+                        <p class="mt-1 text-sm text-red-600">
+                            <i class="fas fa-exclamation-circle mr-1"></i>
+                            {{ form.empleado.errors.0 }}
+                        </p>
+                    {% endif %}
+                </div>
+
+                <!-- Producto -->
+                <div>
+                    <label for="{{ form.producto.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-box text-gray-500 mr-1"></i>
+                        Producto *
+                    </label>
+                    <select name="{{ form.producto.name }}" id="{{ form.producto.id_for_label }}" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 {% if form.producto.errors %}border-red-300 focus:ring-red-500 focus:border-red-500{% endif %}"
+                            required>
+                        <option value="">Seleccione un producto</option>
+                        {% for value, label in form.producto.field.choices %}
+                            {% if value %}
+                                <option value="{{ value }}" {% if form.producto.value == value %}selected{% endif %}>{{ label }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    {% if form.producto.errors %}
+                        <p class="mt-1 text-sm text-red-600">
+                            <i class="fas fa-exclamation-circle mr-1"></i>
+                            {{ form.producto.errors.0 }}
+                        </p>
+                    {% endif %}
+                </div>
+
+                <!-- Bodega -->
+                <div>
+                    <label for="{{ form.bodega.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-warehouse text-gray-500 mr-1"></i>
+                        Bodega *
+                    </label>
+                    <select name="{{ form.bodega.name }}" id="{{ form.bodega.id_for_label }}" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 {% if form.bodega.errors %}border-red-300 focus:ring-red-500 focus:border-red-500{% endif %}"
+                            required>
+                        <option value="">Seleccione una bodega</option>
+                        {% for value, label in form.bodega.field.choices %}
+                            {% if value %}
+                                <option value="{{ value }}" {% if form.bodega.value == value %}selected{% endif %}>{{ label }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    {% if form.bodega.errors %}
+                        <p class="mt-1 text-sm text-red-600">
+                            <i class="fas fa-exclamation-circle mr-1"></i>
+                            {{ form.bodega.errors.0 }}
+                        </p>
+                    {% endif %}
+                </div>
+
+                <!-- Tipo de Inventario -->
+                <div>
+                    <label for="{{ form.tipo_inventario.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-tags text-gray-500 mr-1"></i>
+                        Tipo de Inventario *
+                    </label>
+                    <select name="{{ form.tipo_inventario.name }}" id="{{ form.tipo_inventario.id_for_label }}" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 {% if form.tipo_inventario.errors %}border-red-300 focus:ring-red-500 focus:border-red-500{% endif %}"
+                            required>
+                        <option value="">Seleccione un tipo</option>
+                        {% for value, label in form.tipo_inventario.field.choices %}
+                            {% if value %}
+                                <option value="{{ value }}" {% if form.tipo_inventario.value == value %}selected{% endif %}>{{ label }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    {% if form.tipo_inventario.errors %}
+                        <p class="mt-1 text-sm text-red-600">
+                            <i class="fas fa-exclamation-circle mr-1"></i>
+                            {{ form.tipo_inventario.errors.0 }}
+                        </p>
+                    {% endif %}
+                </div>
+
+                <!-- Rotación de Inventario -->
+                <div>
+                    <label for="{{ form.rotacion_inventario.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-sync-alt text-gray-500 mr-1"></i>
+                        Rotación de Inventario *
+                    </label>
+                    <select name="{{ form.rotacion_inventario.name }}" id="{{ form.rotacion_inventario.id_for_label }}" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 {% if form.rotacion_inventario.errors %}border-red-300 focus:ring-red-500 focus:border-red-500{% endif %}"
+                            required>
+                        <option value="">Seleccione rotación</option>
+                        {% for value, label in form.rotacion_inventario.field.choices %}
+                            {% if value %}
+                                <option value="{{ value }}" {% if form.rotacion_inventario.value == value %}selected{% endif %}>{{ label }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    {% if form.rotacion_inventario.errors %}
+                        <p class="mt-1 text-sm text-red-600">
+                            <i class="fas fa-exclamation-circle mr-1"></i>
+                            {{ form.rotacion_inventario.errors.0 }}
+                        </p>
+                    {% endif %}
+                </div>
+
+                <!-- Stock -->
+                <div>
+                    <label for="{{ form.stock.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-layer-group text-gray-500 mr-1"></i>
+                        Stock *
+                    </label>
+                    <input type="number" 
+                           name="{{ form.stock.name }}" 
+                           id="{{ form.stock.id_for_label }}" 
+                           value="{{ form.stock.value|default:'' }}"
+                           step="0.01"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 {% if form.stock.errors %}border-red-300 focus:ring-red-500 focus:border-red-500{% endif %}"
+                           placeholder="0.00"
+                           required>
+                    {% if form.stock.errors %}
+                        <p class="mt-1 text-sm text-red-600">
+                            <i class="fas fa-exclamation-circle mr-1"></i>
+                            {{ form.stock.errors.0 }}
+                        </p>
+                    {% endif %}
+                </div>
+
+                <!-- Fecha de Entrada -->
+                <div>
+                    <label for="{{ form.fecha_entrada.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-calendar-plus text-gray-500 mr-1"></i>
+                        Fecha de Entrada
+                    </label>
+                    <input type="date" 
+                           name="{{ form.fecha_entrada.name }}" 
+                           id="{{ form.fecha_entrada.id_for_label }}" 
+                           value="{{ form.fecha_entrada.value|date:'Y-m-d'|default:'' }}"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 {% if form.fecha_entrada.errors %}border-red-300 focus:ring-red-500 focus:border-red-500{% endif %}">
+                    {% if form.fecha_entrada.errors %}
+                        <p class="mt-1 text-sm text-red-600">
+                            <i class="fas fa-exclamation-circle mr-1"></i>
+                            {{ form.fecha_entrada.errors.0 }}
+                        </p>
+                    {% endif %}
+                </div>
+
+                <!-- Fecha de Salida -->
+                <div>
+                    <label for="{{ form.fecha_salida.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-calendar-minus text-gray-500 mr-1"></i>
+                        Fecha de Salida
+                    </label>
+                    <input type="date" 
+                           name="{{ form.fecha_salida.name }}" 
+                           id="{{ form.fecha_salida.id_for_label }}" 
+                           value="{{ form.fecha_salida.value|date:'Y-m-d'|default:'' }}"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 {% if form.fecha_salida.errors %}border-red-300 focus:ring-red-500 focus:border-red-500{% endif %}">
+                    {% if form.fecha_salida.errors %}
+                        <p class="mt-1 text-sm text-red-600">
+                            <i class="fas fa-exclamation-circle mr-1"></i>
+                            {{ form.fecha_salida.errors.0 }}
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="flex justify-end space-x-4 mt-8 pt-6 border-t border-gray-200">
+                <a href="{% url 'listar_inventario' %}" 
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-medium rounded-lg shadow-sm transition-colors duration-200">
+                    <i class="fas fa-times mr-2"></i>
+                    Cancelar
+                </a>
+                <button type="submit" 
+                        class="inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors duration-200">
+                    <i class="fas fa-save mr-2"></i>
+                    {% if 'Crear' in titulo %}Crear Inventario{% else %}Guardar Cambios{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Información adicional -->
+<div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
+    <div class="flex items-start">
+        <i class="fas fa-info-circle text-blue-600 mr-2 mt-0.5"></i>
+        <div class="text-blue-800">
+            <h4 class="font-medium">Información importante</h4>
+            <ul class="mt-2 text-sm list-disc list-inside space-y-1">
+                <li>Los campos marcados con (*) son obligatorios</li>
+                <li>El stock debe ser un número positivo con hasta 2 decimales</li>
+                <li>Las fechas son opcionales y pueden dejarse en blanco</li>
+                <li>La fecha de salida no puede ser anterior a la fecha de entrada</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

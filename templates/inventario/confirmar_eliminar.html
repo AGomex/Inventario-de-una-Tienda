@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+
+{% block title %}Eliminar Inventario - {{ block.super }}{% endblock %}
+
+{% block header %}
+<div class="flex items-center">
+    <a href="{% url 'listar_inventario' %}" 
+       class="mr-4 p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors duration-200">
+        <i class="fas fa-arrow-left text-lg"></i>
+    </a>
+    <div>
+        <h1 class="text-3xl font-bold text-red-600">
+            <i class="fas fa-trash-alt mr-3"></i>
+            Eliminar Inventario
+        </h1>
+        <p class="mt-2 text-gray-600">Esta acción no se puede deshacer</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl">
+    <!-- Advertencia -->
+    <div class="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">
+        <div class="flex items-start">
+            <div class="flex-shrink-0">
+                <i class="fas fa-exclamation-triangle text-red-400 text-2xl"></i>
+            </div>
+            <div class="ml-4">
+                <h3 class="text-lg font-medium text-red-800">¡Atención!</h3>
+                <p class="mt-2 text-red-700">
+                    Estás a punto de eliminar permanentemente este registro de inventario. 
+                    Esta acción no se puede deshacer y se perderán todos los datos asociados.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información del inventario a eliminar -->
+    <div class="bg-white shadow-sm rounded-lg overflow-hidden mb-6">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <h2 class="text-lg font-semibold text-gray-900">
+                <i class="fas fa-info-circle text-gray-600 mr-2"></i>
+                Información del Inventario a Eliminar
+            </h2>
+        </div>
+        
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 bg-gray-400 rounded-full mr-3"></div>
+                        <div>
+                            <p class="text-sm text-gray-600">ID</p>
+                            <p class="font-medium text-gray-900">#{{ inventario.id }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 bg-blue-400 rounded-full mr-3"></div>
+                        <div>
+                            <p class="text-sm text-gray-600">Producto</p>
+                            <p class="font-medium text-gray-900">{{ inventario.producto.nombre }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 bg-green-400 rounded-full mr-3"></div>
+                        <div>
+                            <p class="text-sm text-gray-600">Bodega</p>
+                            <p class="font-medium text-gray-900">{{ inventario.bodega.proveedor.nombre }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 bg-purple-400 rounded-full mr-3"></div>
+                        <div>
+                            <p class="text-sm text-gray-600">Empleado</p>
+                            <p class="font-medium text-gray-900">{{ inventario.empleado.nombre }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 bg-yellow-400 rounded-full mr-3"></div>
+                        <div>
+                            <p class="text-sm text-gray-600">Tipo de Inventario</p>
+                            <p class="font-medium text-gray-900">{{ inventario.tipo_inventario.nombre }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 bg-indigo-400 rounded-full mr-3"></div>
+                        <div>
+                            <p class="text-sm text-gray-600">Stock</p>
+                            <p class="font-medium text-gray-900">{{ inventario.stock }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 bg-teal-400 rounded-full mr-3"></div>
+                        <div>
+                            <p class="text-sm text-gray-600">Rotación</p>
+                            <p class="font-medium text-gray-900">{{ inventario.rotacion_inventario.nombre }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        {% if inventario.fecha_entrada %}
+                            <div class="flex items-center">
+                                <i class="fas fa-arrow-down text-green-500 text-sm mr-2"></i>
+                                <div>
+                                    <p class="text-sm text-gray-600">Fecha de Entrada</p>
+                                    <p class="font-medium text-gray-900">{{ inventario.fecha_entrada|date:"d/m/Y" }}</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        {% if inventario.fecha_salida %}
+                            <div class="flex items-center">
+                                <i class="fas fa-arrow-up text-red-500 text-sm mr-2"></i>
+                                <div>
+                                    <p class="text-sm text-gray-600">Fecha de Salida</p>
+                                    <p class="font-medium text-gray-900">{{ inventario.fecha_salida|date:"d/m/Y" }}</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario de confirmación -->
+    <div class="bg-white shadow-sm rounded-lg">
+        <div class="p-6">
+            <form method="post">
+                {% csrf_token %}
+                <div class="text-center">
+                    <div class="h-16 w-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-question text-red-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">
+                        ¿Estás seguro de que deseas eliminar este inventario?
+                    </h3>
+                    <p class="text-gray-600 mb-8">
+                        Se eliminará el registro de <strong>{{ inventario.producto.nombre }}</strong> 
+                        de la bodega <strong>{{ inventario.bodega.proveedor.nombre }}</strong>.
+                    </p>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="flex justify-center space-x-4">
+                    <a href="{% url 'listar_inventario' %}" 
+                       class="inline-flex items-center px-6 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-medium rounded-lg shadow-sm transition-colors duration-200">
+                        <i class="fas fa-times mr-2"></i>
+                        Cancelar
+                    </a>
+                    <button type="submit" 
+                            class="inline-flex items-center px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg shadow-sm transition-colors duration-200">
+                        <i class="fas fa-trash-alt mr-2"></i>
+                        Sí, Eliminar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Nota adicional -->
+    <div class="mt-6 bg-gray-50 border border-gray-200 rounded-lg p-4">
+        <div class="flex items-start">
+            <i class="fas fa-lightbulb text-gray-500 mr-2 mt-0.5"></i>
+            <div class="text-gray-700">
+                <h4 class="font-medium">Nota</h4>
+                <p class="mt-1 text-sm">
+                    Si solo necesitas actualizar la información, considera usar la opción "Editar" 
+                    en lugar de eliminar el registro completo.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Inventario - {{ block.super }}{% endblock %}
+
+{% block header %}
+<div class="flex justify-between items-center">
+    <div>
+        <h1 class="text-3xl font-bold text-gray-900">
+            <i class="fas fa-boxes text-blue-600 mr-3"></i>
+            Gestión de Inventario
+        </h1>
+        <p class="mt-2 text-gray-600">Administra el inventario de productos en las diferentes bodegas</p>
+    </div>
+    <div>
+        <a href="{% url 'crear_inventario' %}" 
+           class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors duration-200">
+            <i class="fas fa-plus mr-2"></i>
+            Nuevo Inventario
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-center">
+            <div class="p-3 bg-blue-100 rounded-full">
+                <i class="fas fa-box text-blue-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm text-gray-600">Total Productos</p>
+                <p class="text-2xl font-bold text-gray-900">{{ inventarios.count }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-center">
+            <div class="p-3 bg-green-100 rounded-full">
+                <i class="fas fa-warehouse text-green-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm text-gray-600">Stock Total</p>
+                <p class="text-2xl font-bold text-gray-900">
+                    {{ total_stock|floatformat:0 }}
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-center">
+            <div class="p-3 bg-yellow-100 rounded-full">
+                <i class="fas fa-exclamation-triangle text-yellow-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm text-gray-600">Stock Bajo</p>
+                <p class="text-2xl font-bold text-gray-900">
+                    {{ stock_bajo }}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Inventory Table -->
+<div class="bg-white shadow-sm rounded-lg overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="text-lg font-semibold text-gray-900">
+            <i class="fas fa-list mr-2 text-gray-600"></i>
+            Lista de Inventario
+        </h2>
+    </div>
+    
+    {% if inventarios %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bodega</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Empleado</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fechas</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for inventario in inventarios %}
+                    <tr class="hover:bg-gray-50 transition-colors duration-150">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            #{{ inventario.id }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-box text-blue-600 text-sm"></i>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-medium text-gray-900">{{ inventario.producto.nombre }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">{{ inventario.bodega.proveedor.nombre }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">{{ inventario.empleado.nombre }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                                         bg-purple-100 text-purple-800">
+                                {{ inventario.tipo_inventario.descripcion }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                {% if inventario.stock < 50 %}
+                                    <div class="h-2 w-2 bg-red-400 rounded-full mr-2"></div>
+                                    <span class="text-sm font-medium text-red-600">{{ inventario.stock }}</span>
+                                {% elif inventario.stock < 200 %}
+                                    <div class="h-2 w-2 bg-yellow-400 rounded-full mr-2"></div>
+                                    <span class="text-sm font-medium text-yellow-600">{{ inventario.stock }}</span>
+                                {% else %}
+                                    <div class="h-2 w-2 bg-green-400 rounded-full mr-2"></div>
+                                    <span class="text-sm font-medium text-green-600">{{ inventario.stock }}</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-500">
+                            <div>
+                                {% if inventario.fecha_entrada %}
+                                    <div class="flex items-center mb-1">
+                                        <i class="fas fa-arrow-down text-green-500 mr-1"></i>
+                                        {{ inventario.fecha_entrada|date:"d/m/Y" }}
+                                    </div>
+                                {% endif %}
+                                {% if inventario.fecha_salida %}
+                                    <div class="flex items-center">
+                                        <i class="fas fa-arrow-up text-red-500 mr-1"></i>
+                                        {{ inventario.fecha_salida|date:"d/m/Y" }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div class="flex space-x-2">
+                                <a href="{% url 'editar_inventario' inventario.pk %}" 
+                                   class="inline-flex items-center px-3 py-1 bg-yellow-100 hover:bg-yellow-200 text-yellow-800 text-xs font-medium rounded-md transition-colors duration-200">
+                                    <i class="fas fa-edit mr-1"></i>
+                                    Editar
+                                </a>
+                                <a href="{% url 'eliminar_inventario' inventario.pk %}" 
+                                   class="inline-flex items-center px-3 py-1 bg-red-100 hover:bg-red-200 text-red-800 text-xs font-medium rounded-md transition-colors duration-200">
+                                    <i class="fas fa-trash mr-1"></i>
+                                    Eliminar
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="text-center py-12">
+            <div class="h-24 w-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-inbox text-gray-400 text-3xl"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">No hay inventario registrado</h3>
+            <p class="text-gray-500 mb-6">Comienza agregando tu primer producto al inventario.</p>
+            <a href="{% url 'crear_inventario' %}" 
+               class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200">
+                <i class="fas fa-plus mr-2"></i>
+                Crear Primer Inventario
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
