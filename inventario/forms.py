@@ -1,5 +1,5 @@
 from django import forms
-from .models import Inventario
+from .models import SGI_T_INVENTARIO as Inventario
 
 class InventarioForm(forms.ModelForm):
     class Meta:
