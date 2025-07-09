@@ -10,7 +10,7 @@ def listar_inventario(request):
     # Calcular el stock total
     total_stock = inventarios.aggregate(Sum('stock'))['stock__sum'] or 0
 
-    # Contar cuántos inventarios tienen stock bajo (< 10)
+    # Contar cuántos inventarios tienen stock bajo (< 50)
     stock_bajo = inventarios.filter(stock__lt=50).count()
 
     return render(request, 'inventario/listar.html', {
